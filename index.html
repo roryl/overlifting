@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Overlifter — Track what matters</title>
+  <meta name="description" content="Overlifter is a lifting app that tracks the one number that shows you if you're getting stronger." />
+
+  <!-- Bootswatch Sketchy (Bootstrap) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sketchy/bootstrap.min.css">
+
+  <style>
+    :root { --hero-pad: clamp(2rem, 4vw, 4rem); }
+
+    body { background: var(--bs-body-bg); }
+    .container { max-width: 1024px; }
+
+    .paper {
+      border: 2px solid var(--bs-border-color);
+      border-radius: 1rem;
+      box-shadow: 0 .75rem 0 rgba(0,0,0,.08);
+    }
+    .hero { padding: var(--hero-pad); position: relative; overflow: hidden; }
+
+    .badge-sketch {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      border: 2px dashed var(--bs-secondary);
+      padding: .35rem .75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      background: rgba(255,255,255,.45);
+    }
+    .hero-title { letter-spacing: -0.02em; }
+    .subtle { opacity: .85; }
+
+    .feature-icon {
+      width: 3rem; height: 3rem;
+      display: grid; place-items: center;
+      border-radius: 1rem;
+      border: 2px solid var(--bs-border-color);
+      background: rgba(0,0,0,.03);
+      font-size: 1.35rem;
+      box-shadow: .35rem .35rem 0 rgba(0,0,0,.06);
+    }
+
+    .metric-card {
+      border: 2px solid var(--bs-border-color);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      background: rgba(255,255,255,.55);
+      box-shadow: 0 .6rem 0 rgba(0,0,0,.08);
+    }
+    .metric-number { font-size: clamp(2.5rem, 4vw, 3.5rem); line-height: 1; }
+
+    .divider {
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--bs-border-color),
+        var(--bs-border-color) 10px,
+        transparent 10px,
+        transparent 18px
+      );
+      border-radius: 999px;
+    }
+
+    .cta-sticky {
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(6px);
+      border-top: 2px solid var(--bs-border-color);
+    }
+
+    .tiny { font-size: .95rem; }
+    footer a { text-decoration: none; }
+
+    html { scroll-behavior: smooth; }
+    .scroll-offset { scroll-margin-top: 90px; }
+
+    /* Make outline buttons BLUE (not black) site-wide */
+    .btn-outline-secondary {
+      color: var(--bs-info) !important;
+      border-color: var(--bs-info) !important;
+      background: transparent !important;
+    }
+    .btn-outline-secondary:hover,
+    .btn-outline-secondary:focus {
+      color: #fff !important;
+      background: var(--bs-info) !important;
+      border-color: var(--bs-info) !important;
+    }
+
+    /* Keep btn-outline-info blue too */
+    .btn-outline-info {
+      color: var(--bs-info) !important;
+      border-color: var(--bs-info) !important;
+      background: transparent !important;
+    }
+    .btn-outline-info:hover,
+    .btn-outline-info:focus {
+      color: #fff !important;
+      background: var(--bs-info) !important;
+      border-color: var(--bs-info) !important;
+    }
+
+    /* Feature nav active state (blue highlight) */
+    .feature-nav .btn.active {
+      background-color: var(--bs-info) !important;
+      color: #fff !important;
+      border-color: var(--bs-info) !important;
+    }
+
+    /* Testimonial horizontal scroll */
+    .hscroll {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: .5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .hscroll::-webkit-scrollbar { height: 10px; }
+    .hscroll::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,.15);
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.8);
+    }
+    .snap-card {
+      scroll-snap-align: start;
+      min-width: 280px;
+      max-width: 360px;
+      flex: 0 0 auto;
+    }
+
+    /* ====== MOBILE PHONE UI (benefits) ====== */
+    .big-phone-wrap { display: grid; place-items: center; }
+    .big-phone {
+      width: min(720px, 100%);
+      border: 0; border-radius: 0;
+      background: transparent;
+      padding: 0;
+      position: relative;
+      box-shadow: none;
+    }
+    
+    .phone-topbar {
+      padding-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .phone-screen {
+      border: 3px solid #000;
+      border-radius: 28px;
+      padding: 18px;
+      min-height: 420px;
+      display: grid;
+      align-content: start;
+      background: #fff;
+      position: relative;
+    }
+    .phone-slide { display: none; }
+    .phone-slide.active { display: block; }
+    .phone-slide h3 { margin-bottom: .75rem; }
+    .phone-slide .phone-img {
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto 12px;
+      display: block;
+      border: 2px solid #000;
+      border-radius: 18px;
+      background: #fff;
+    }
+    .phone-desc { margin: 0 auto; max-width: 540px; }
+
+    /* Shared round nav button style (mobile + desktop) */
+    .round-nav {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px !important;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--bs-info) !important;
+      color: var(--bs-info) !important;
+      background: #fff !important;
+      font-size: 22px;
+      line-height: 1;
+      box-shadow: .35rem .35rem 0 rgba(0,0,0,.08);
+    }
+    .round-nav:hover,
+    .round-nav:focus {
+      background: var(--bs-info) !important;
+      color: #fff !important;
+      border-color: var(--bs-info) !important;
+    }
+
+    /* Mobile side buttons */
+    .phone-side-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+    }
+    .phone-side-btn.left { left: -26px; }
+    .phone-side-btn.right { right: -26px; }
+
+    /* Story image: round + crop shifted DOWN inside circle */
+    .story-img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      object-position: center 10%;
+      border-radius: 999px;
+      border: 2px solid var(--bs-border-color);
+      box-shadow: .35rem .35rem 0 rgba(0,0,0,.06);
+      background: #fff;
+    }
+
+    /* ====== MOBILE vs DESKTOP BENEFITS RENDERING ====== */
+    .benefits-mobile { display: block; }
+    .benefits-desktop { display: none; }
+    @media (min-width: 992px) {
+      .benefits-mobile { display: none; }
+      .benefits-desktop { display: block; }
+    }
+
+    /* ===== Desktop center-highlight infinite carousel (FIXED + animated) ===== */
+    .desktop-carousel {
+      position: relative;
+      padding: 8px 0;
+    }
+
+    .carousel-track {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 18px;
+      position: relative;
+    }
+
+    /* Nav buttons on desktop carousel */
+    .desk-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+    }
+    .desk-nav.left { left: -10px; }
+    .desk-nav.right { right: -10px; }
+
+    .dphone {
+      flex: 0 0 min(290px, 30%);
+      cursor: pointer;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+    .dphone.center { transform: scale(1.08); z-index: 2; }
+    .dphone.side { transform: scale(.94); opacity: .9; }
+
+    /* Fade/slide animation for swapping content */
+    .dphone .mini-phone {
+      animation: none;
+    }
+    .dphone.anim-in-left .mini-phone {
+      animation: slideInLeft .18s ease both;
+    }
+    .dphone.anim-in-right .mini-phone {
+      animation: slideInRight .18s ease both;
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Phone look */
+    .dphone .mini-phone { position: relative; }
+   
+
+    /* Equal height phones */
+.dphone .mini-screen {
+  border: 3px solid #000;
+  border-radius: 28px;
+  padding: 16px;
+  background: #fff;
+  /* REMOVE fixed height + flex layout */
+  height: auto;
+  display: block;
+}
+
+    .dphone .mini-title {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+    .dphone .mini-img {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 12px;
+      display: block;
+      border: 2px solid #000;
+      border-radius: 18px;
+      background: #fff;
+    }
+    .dphone .mini-desc {
+  text-align: center;
+  margin: 0;
+  /* REMOVE flex behaviors */
+  display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="py-3">
+    <div class="container d-flex align-items-center justify-content-between">
+      <a class="navbar-brand fw-bold" href="#">Overlifter</a>
+      <div class="d-none d-md-flex gap-2">
+        <a class="btn btn-outline-secondary" href="#tracking">What it tracks</a>
+        <a class="btn btn-outline-secondary" href="#features">Benefits</a>
+        <a class="btn btn-info" href="#signup">Start Overlifting</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="container mb-5">
+      <div class="paper hero">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <div class="badge-sketch mb-3">
+              <span aria-hidden="true">&#127947;</span>
+              <span>Track what matters. Skip the nonsense.</span>
+            </div>
+
+            <h1 class="display-4 fw-bold hero-title mb-3">Overlifter: Your Strength Tracker</h1>
+            <h2 class="fw-bold">Simplify your progress with one simple metric.</h2>
+
+            <p class="lead subtle mb-4">
+              Forget complicated logs. Overlifter tracks your progress automatically, showing you exactly how much stronger you're getting each workout.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2" id="cta">
+              <a class="btn btn-info btn-lg" href="#signup">Start Tracking Now</a>
+              <a class="btn btn-outline-secondary btn-lg" href="#tracking">See How it Works</a>
+            </div>
+
+            <p class="mt-3 tiny subtle mb-0">Join Overlifter for free and start your journey today.</p>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="metric-card">
+              <img
+                src="assets/landing/overlifter-preview.png"
+                alt="Overlifter app preview showing progress"
+                class="img-fluid rounded mb-3"
+              >
+
+              <div class="d-flex align-items-start justify-content-between">
+                <div>
+                  <div class="text-uppercase tiny fw-bold subtle">Your overscore</div>
+                  <div class="metric-number fw-bold">+2</div>
+                  <div class="subtle">Overlifter: you made excellent progress this week.</div>
+                </div>
+                <div class="feature-icon" aria-hidden="true">&#x1F4C8;</div>
+              </div>
+
+              <ul class="mb-0 mt-3">
+                <li><strong>One number</strong> that shows progress</li>
+                <li><strong>Less tracking</strong> during your workout</li>
+                <li><strong>More motivation</strong> because it's obvious you're improving</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRACKING -->
+    <section id="tracking" class="container mb-5">
+      <div class="paper p-4 p-md-5">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-6">
+            <h2 class="display-6 fw-bold mb-3">Overscore: Track What Matters</h2>
+            <p class="lead subtle">The goal isn't endless data entry—it's getting stronger.</p>
+            <p>Overlifter simplifies your tracking:</p>
+
+            <div class="d-grid gap-3">
+              <div class="d-flex gap-3">
+                <div class="feature-icon" aria-hidden="true">&#x2705;</div>
+                <div>
+                  <h3 class="h5 fw-bold mb-1">Overset</h3>
+                  <p class="mb-0 subtle">Log your key set effortlessly. See progress without drowning in details.</p>
+                </div>
+              </div>
+
+              <div class="d-flex gap-3">
+                <div class="feature-icon" aria-hidden="true">&#x1F3CB;</div>
+                <div>
+                  <h3 class="h5 fw-bold mb-1">Overweight</h3>
+                  <p class="mb-0 subtle">Tracks your strength gains and when to upweight.</p>
+                </div>
+              </div>
+
+              <div class="d-flex gap-3">
+                <div class="feature-icon" aria-hidden="true">&#x1F501;</div>
+                <div>
+                  <h3 class="h5 fw-bold mb-1">Overreps</h3>
+                  <p class="mb-0 subtle">Tracks your reps and when to increase.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="metric-card">
+              <h3 class="h4 fw-bold mb-3">Do you even overlift, bro?</h3>
+              <p class="mb-0">
+                Strength comes from lifting more over time. Overlifter cuts the hassle.
+                Just log your key lifts and watch your overscore rise—progress that’s obvious and motivating.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="container mb-5" id="features">
+      <div class="paper p-4 p-md-5">
+        <div class="mb-3">
+          <h2 class="display-6 fw-bold mb-2">Benefits of Overlifter</h2>
+          <p class="lead subtle mb-0">See all that Overlifter has to offer.</p>
+        </div>
+
+        <div class="divider mb-4"></div>
+
+        <!-- MOBILE VERSION (unchanged) -->
+        <div class="benefits-mobile">
+          <div class="big-phone-wrap">
+            <div class="big-phone">
+              <div class="phone-topbar feature-nav">
+                <button class="btn btn-outline-info active" type="button" data-feature="slide-0">Overscore</button>
+                <button class="btn btn-outline-info" type="button" data-feature="slide-1">All Time Peaks</button>
+                <button class="btn btn-outline-info" type="button" data-feature="slide-2">Workout Overview</button>
+              </div>
+
+              <div class="phone-screen">
+                <div class="phone-side-btn left">
+                  <button class="round-nav" type="button" id="phonePrev" aria-label="Previous feature">←</button>
+                </div>
+                <div class="phone-side-btn right">
+                  <button class="round-nav" type="button" id="phoneNext" aria-label="Next feature">→</button>
+                </div>
+
+                <div class="phone-slide active feature-section" id="slide-0">
+                  <h3 class="h2 fw-bold text-center">Overscore</h3>
+                  <img class="phone-img" src="assets/landing/Overscore.jpg" alt="Overscore feature screenshot">
+                  <div class="phone-desc text-center subtle">
+                    Your progress in one simple number that tells you if you're getting stronger.
+                  </div>
+                </div>
+
+                <div class="phone-slide feature-section" id="slide-1">
+                  <h3 class="h2 fw-bold text-center">All-Time Peaks</h3>
+                  <img class="phone-img" src="assets/landing/All_time_peaks.jpg" alt="All Time Peaks feature screenshot">
+                  <div class="phone-desc text-center subtle">
+                    See your all-time best lifts at a glance. Know where you stand and what to focus on next.
+                  </div>
+                </div>
+
+                <div class="phone-slide feature-section" id="slide-2">
+                  <h3 class="h2 fw-bold text-center">Workout Overview</h3>
+                  <img class="phone-img" src="assets/landing/Workout.jpg" alt="Workout Overview feature screenshot">
+                  <div class="phone-desc text-center subtle">
+                    See your entire workout overview and progress with ease. Have fun tracking—and get the data that matters.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESKTOP VERSION (FIXED + arrows + animation + text inside phones) -->
+        <div class="benefits-desktop">
+          <div class="desktop-carousel" id="desktopCarousel">
+            <div class="carousel-track">
+              <div class="desk-nav left">
+                <button class="round-nav" type="button" id="deskPrev" aria-label="Previous feature">←</button>
+              </div>
+              <div class="desk-nav right">
+                <button class="round-nav" type="button" id="deskNext" aria-label="Next feature">→</button>
+              </div>
+
+              <div class="dphone side" data-pos="-1"></div>
+              <div class="dphone center" data-pos="0"></div>
+              <div class="dphone side" data-pos="1"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SOCIAL PROOF (testimonial slider) -->
+    <section class="container mb-5" id="testimonials">
+      <div class="paper p-4 p-md-5">
+        <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-3">
+          <div>
+            <h2 class="display-6 fw-bold mb-2">People are overlifting</h2>
+            <p class="lead subtle mb-0">Add testimonials here. Click to scroll.</p>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" type="button" id="tPrev" aria-label="Scroll testimonials left">←</button>
+            <button class="btn btn-outline-secondary" type="button" id="tNext" aria-label="Scroll testimonials right">→</button>
+          </div>
+        </div>
+
+        <div class="divider mb-4"></div>
+
+        <div class="hscroll" id="tScroller">
+          <div class="metric-card snap-card">
+            <div class="tiny fw-bold subtle text-uppercase mb-2">Testimonial</div>
+            <h3 class="h5 fw-bold mb-2">Name / Title</h3>
+            <p class="subtle mb-0">"Write the quote here. Make it specific about the problem it solved."</p>
+          </div>
+
+          <div class="metric-card snap-card">
+            <div class="tiny fw-bold subtle text-uppercase mb-2">Testimonial</div>
+            <h3 class="h5 fw-bold mb-2">Name / Title</h3>
+            <p class="subtle mb-0">"Write the quote here. Keep it short and punchy."</p>
+          </div>
+
+          <div class="metric-card snap-card">
+            <div class="tiny fw-bold subtle text-uppercase mb-2">Testimonial</div>
+            <h3 class="h5 fw-bold mb-2">Name / Title</h3>
+            <p class="subtle mb-0">"Write the quote here. What changed after using Overlifter?"</p>
+          </div>
+
+          <div class="metric-card snap-card">
+            <div class="tiny fw-bold subtle text-uppercase mb-2">Testimonial</div>
+            <h3 class="h5 fw-bold mb-2">Name / Title</h3>
+            <p class="subtle mb-0">"Write the quote here. Call out 'one number' / 'less tracking' / 'more motivation'."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIGNUP -->
+    <section id="signup" class="container mb-5">
+      <div class="paper p-4 p-md-5">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-7">
+            <h2 class="h1 fw-bold mb-2">START OVERLIFTING</h2>
+            <p class="lead subtle mb-0">Want the simplest way to know if your training is working? Start Overlifting now.</p>
+            <p class="subtle mt-3 mb-0">
+              Tracking progress shouldn't be painful. Overlifter makes it fun to visualize your gains.
+              </p>
+              <p></p>
+              Overlifter is invite-only, but submit your email to get an invite from Rory, our founder.
+              Only friends let friends overlift.
+            </p>
+          </div>
+
+          <div class="col-lg-5">
+            <form
+              action="https://app.convertkit.com/forms/YOUR_FORM_ID/subscriptions"
+              method="post"
+              class="needs-validation"
+              novalidate
+            >
+              <div class="mb-2">
+                <label class="form-label fw-bold" for="email">Email</label>
+                <input
+                  class="form-control form-control-lg"
+                  type="email"
+                  name="email_address"
+                  id="email"
+                  placeholder="you@domain.com"
+                  autocomplete="email"
+                  required
+                >
+                <div class="invalid-feedback">Please enter a valid email.</div>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label fw-bold" for="phone">Phone (optional for text updates)</label>
+                <input
+                  class="form-control form-control-lg"
+                  type="tel"
+                  name="fields[phone_number]"
+                  id="phone"
+                  placeholder="(555) 555-5555"
+                  inputmode="tel"
+                  autocomplete="tel"
+                >
+              </div>
+
+              <button class="btn btn-info btn-lg w-100" type="submit">
+                I want to start overlifting
+              </button>
+
+              <div class="tiny subtle mt-2">
+                Overlifter is free, no sign up required.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORY -->
+    <section id="story" class="container mb-5">
+      <div class="paper p-4 p-md-5">
+        <h2 class="h2 fw-bold mb-3">Why I built Overlifter.</h2>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-md-8">
+            <p class="subtle">
+              Months passed and I wasn't making progress. I hadn't gotten any stronger on the lifts I was doing,
+              and I was getting demotivated.
+            </p>
+            <p class="subtle mb-0">
+              I tried tracking with workout apps, but none of it showed real progress. So I built Overlifter to track
+              what actually matters—then used it and broke my plateau in a week.
+            </p>
+          </div>
+
+          <div class="col-md-4 text-center text-md-end">
+            <img
+              src="assets/landing/rory_.png"
+              alt="Story image"
+              class="story-img"
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="container mb-5">
+      <div class="paper p-4 p-md-5">
+        <h2 class="h3 fw-bold mb-4">FAQ</h2>
+        <div class="accordion" id="faq">
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="q1">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
+                What makes Overlifter different?
+              </button>
+            </h3>
+            <div id="a1" class="accordion-collapse collapse" data-bs-parent="#faq">
+              <div class="accordion-body">
+                Most apps collect tons of workout details. Overlifter is built to answer one question fast:
+                are you lifting more over time? We simplify tracking so progress (and motivation) feels fun.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="q2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
+                Do I need to be advanced?
+              </button>
+            </h3>
+            <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faq">
+              <div class="accordion-body">
+                Nope. If you lift (or want to start), you'll benefit from clarity and momentum.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h3 class="accordion-header" id="q3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
+                Is it available yet?
+              </button>
+            </h3>
+            <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faq">
+              <div class="accordion-body">
+                Yes. It's currently invite-only and we have limited spots.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container pb-5">
+    <div class="paper p-4 d-flex flex-column flex-md-row gap-2 align-items-md-center justify-content-between">
+      <div class="subtle">© <span id="year"></span> Overlifter</div>
+      <div class="d-flex gap-3">
+        <a href="#tracking">Tracking</a>
+        <a href="#features">Benefits</a>
+        <a href="#testimonials">Proof</a>
+        <a href="#signup">Start</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile CTA -->
+  <div class="cta-sticky d-md-none">
+    <div class="container py-3 d-flex gap-2">
+      <a class="btn btn-info w-100" href="#signup">Start Overlifting</a>
+      <a class="btn btn-outline-secondary w-100" href="#tracking">What it tracks</a>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (for accordion) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Testimonials left/right scroll controls
+    const scroller = document.getElementById('tScroller');
+    const prevBtn = document.getElementById('tPrev');
+    const nextBtn = document.getElementById('tNext');
+
+    function scrollTestimonials(dir) {
+      if (!scroller) return;
+      const card = scroller.querySelector('.snap-card');
+      const step = card ? (card.getBoundingClientRect().width + 16) : 320;
+      scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => scrollTestimonials(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => scrollTestimonials(1));
+
+    // ====== MOBILE PHONE BENEFITS SLIDER (tabs + side arrows) ======
+    const phoneSlides = Array.from(document.querySelectorAll('.benefits-mobile .phone-slide'));
+    const phoneTabs = Array.from(document.querySelectorAll('.benefits-mobile .phone-topbar .btn'));
+    const phonePrev = document.getElementById('phonePrev');
+    const phoneNext = document.getElementById('phoneNext');
+
+    let phoneIndex = 0;
+
+    function setPhoneSlide(idx) {
+      if (!phoneSlides.length) return;
+      phoneIndex = (idx + phoneSlides.length) % phoneSlides.length;
+      phoneSlides.forEach((s, i) => s.classList.toggle('active', i === phoneIndex));
+      phoneTabs.forEach((b, i) => b.classList.toggle('active', i === phoneIndex));
+    }
+
+    phoneTabs.forEach((btn, i) => btn.addEventListener('click', () => setPhoneSlide(i)));
+    if (phonePrev) phonePrev.addEventListener('click', () => setPhoneSlide(phoneIndex - 1));
+    if (phoneNext) phoneNext.addEventListener('click', () => setPhoneSlide(phoneIndex + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') setPhoneSlide(phoneIndex - 1);
+      if (e.key === 'ArrowRight') setPhoneSlide(phoneIndex + 1);
+    });
+
+    // ===== Desktop center-highlight benefits carousel (infinite) + arrows + animation =====
+    const desktopCarouselEl = document.getElementById('desktopCarousel');
+    const deskPrev = document.getElementById('deskPrev');
+    const deskNext = document.getElementById('deskNext');
+
+    const desktopSlides = [
+      {
+        title: "Overscore",
+        img: "assets/landing/Overscore.jpg",
+        alt: "Overscore feature screenshot",
+        desc: "Your progress in one simple number that tells you if you're getting stronger."
+      },
+      {
+        title: "All-Time Peaks",
+        img: "assets/landing/All_time_peaks.jpg",
+        alt: "All Time Peaks feature screenshot",
+        desc: "See your all-time best lifts at a glance. Know where you stand and what to focus on next."
+      },
+      {
+        title: "Workout Overview",
+        img: "assets/landing/Workout.jpg",
+        alt: "Workout Overview feature screenshot",
+        desc: "See your entire workout overview and progress with ease. Have fun tracking—and get the data that matters."
+      }
+    ];
+
+    function desktopCardHTML(s) {
+      return `
+        <div class="mini-phone">
+          <div class="mini-screen">
+            <h3 class="h3 fw-bold mini-title">${s.title}</h3>
+            <img class="mini-img" src="${s.img}" alt="${s.alt}">
+            <p class="subtle mini-desc">${s.desc}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function initDesktopCarousel() {
+      if (!desktopCarouselEl) return;
+
+      const slots = Array.from(desktopCarouselEl.querySelectorAll('.dphone'));
+      let idx = 0;
+
+      function clearAnimClasses() {
+        slots.forEach(s => s.classList.remove('anim-in-left', 'anim-in-right'));
+      }
+
+      function render(animDir = 0) {
+        const prev = (idx - 1 + desktopSlides.length) % desktopSlides.length;
+        const next = (idx + 1) % desktopSlides.length;
+
+        // Apply animation direction to the 3 slots
+        clearAnimClasses();
+        if (animDir === 1) {
+          slots.forEach(s => s.classList.add('anim-in-right'));
+        } else if (animDir === -1) {
+          slots.forEach(s => s.classList.add('anim-in-left'));
+        }
+
+        slots.forEach(slot => {
+          const pos = Number(slot.dataset.pos);
+          if (pos === -1) slot.innerHTML = desktopCardHTML(desktopSlides[prev]);
+          if (pos === 0)  slot.innerHTML = desktopCardHTML(desktopSlides[idx]);
+          if (pos === 1)  slot.innerHTML = desktopCardHTML(desktopSlides[next]);
+        });
+      }
+
+      function go(dir) {
+        idx = (idx + dir + desktopSlides.length) % desktopSlides.length;
+        render(dir);
+      }
+
+      // Click: left => prev, center => next, right => next
+      slots.forEach(slot => {
+        slot.addEventListener('click', () => {
+          const pos = Number(slot.dataset.pos);
+          if (pos === -1) return go(-1);
+          return go(1);
+        });
+      });
+
+      // Arrow buttons
+      if (deskPrev) deskPrev.addEventListener('click', () => go(-1));
+      if (deskNext) deskNext.addEventListener('click', () => go(1));
+
+      // Keyboard arrows (desktop only)
+      document.addEventListener('keydown', (e) => {
+        const isDesktop = window.matchMedia('(min-width: 992px)').matches;
+        if (!isDesktop) return;
+        if (e.key === 'ArrowLeft') go(-1);
+        if (e.key === 'ArrowRight') go(1);
+      });
+
+      render(0);
+    }
+
+    initDesktopCarousel();
+
+    // Basic bootstrap validation hook
+    (() => {
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
+</body>
+</html>
