@@ -511,7 +511,7 @@
     </section>
 
     <!-- SOCIAL PROOF (testimonial slider) -->
-    <section class="container mb-5" id="testimonials">
+    <section class="container mb-5 d-none" id="testimonials">
       <div class="paper p-4 p-md-5">
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-3">
           <div>
@@ -572,17 +572,18 @@
 
           <div class="col-lg-5">
             <form
-              action="https://app.convertkit.com/forms/YOUR_FORM_ID/subscriptions"
-              method="post"
+              action="http://127.0.0.1:63306/home/main/signup"
+              method="get"
               class="needs-validation"
               novalidate
+			  target="_blank"
             >
               <div class="mb-2">
                 <label class="form-label fw-bold" for="email">Email</label>
                 <input
                   class="form-control form-control-lg"
                   type="email"
-                  name="email_address"
+                  name="EmailAddress"
                   id="email"
                   placeholder="you@domain.com"
                   autocomplete="email"
@@ -596,7 +597,7 @@
                 <input
                   class="form-control form-control-lg"
                   type="tel"
-                  name="fields[phone_number]"
+                  name="PhoneNumber"
                   id="phone"
                   placeholder="(555) 555-5555"
                   inputmode="tel"
